@@ -1,0 +1,6 @@
+
+b	java:S112L"FDefine and throw a dedicated exception instead of using a generic one.(¥¯ÎÌ8¬ò£•µ1
+[
+java:S4719D"9Replace charset name argument with StandardCharsets.UTF_8(…Ì§×üÿÿÿÿ8éò£•µ1
+G	java:S106h"+Replace this use of System.out by a logger.(Î®øé8ôò£•µ1
+L	java:S106m"+Replace this use of System.out by a logger.(½–Ş¬ûÿÿÿÿ8õò£•µ1
