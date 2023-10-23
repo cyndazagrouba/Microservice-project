@@ -1,0 +1,7 @@
+com\ecommerce\orderservice\controllers\OrderController.class
+com\ecommerce\orderservice\services\StripeService.class
+com\ecommerce\orderservice\services\OrderService.class
+com\ecommerce\orderservice\entities\TypeModalite.class
+com\ecommerce\orderservice\OrderServiceApplication.class
+com\ecommerce\orderservice\entities\Order.class
+com\ecommerce\orderservice\repositories\OrderRepository.class
