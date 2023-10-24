@@ -1,0 +1,156 @@
+version: '3'
+services:
+  eureka:
+    image: eurekaserver:latest  # L'image Docker pour le serveur Eureka
+    ports:
+      - "8763:8761"  # Port exposé pour le serveur Eureka
+
+
+  # MySQL for Commande Service
+  order-mysql:
+    image: mysql:latest
+    environment:
+      MYSQL_ROOT_PASSWORD:
+      MYSQL_RANDOM_ROOT_PASSWORD:
+      MYSQL_ALLOW_EMPTY_PASSWORD: "true"
+      MYSQL_DATABASE: orderservice
+      spring:
+      datasource:
+        url=jdbc:mysql://mysqldb:3306/orderservice?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true
+
+    ports:
+      - "3305:3306"
+
+  user-mysql:
+    image: mysql:latest
+    environment:
+      MYSQL_ROOT_PASSWORD:
+      MYSQL_RANDOM_ROOT_PASSWORD:
+      MYSQL_ALLOW_EMPTY_PASSWORD: "true"
+      MYSQL_DATABASE: ElbeyUser
+      spring:
+      datasource:
+        url=jdbc:mysql://mysqldb:3306/ElbeyUser?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true
+
+    ports:
+      - "3304:3306"
+
+    # MySQL for Blog Service
+  blog-mysql:
+    image: mysql:latest
+    environment:
+      MYSQL_ROOT_PASSWORD:
+      MYSQL_RANDOM_ROOT_PASSWORD:
+      MYSQL_ALLOW_EMPTY_PASSWORD: "true"
+      MYSQL_DATABASE: ahlemss
+      spring:
+      datasource:
+        url=jdbc:mysql://mysqldb:3306/ahlemss?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true
+
+    ports:
+      - "3003:3306"
+
+    # MySQL for Produit Service
+  produit-mysql:
+    image: mysql:latest
+    environment:
+      MYSQL_DATABASE: springProduct
+      MYSQL_ROOT_PASSWORD:
+      MYSQL_RANDOM_ROOT_PASSWORD:
+      MYSQL_ALLOW_EMPTY_PASSWORD: "true"
+      spring:
+      datasource:
+          url=jdbc:mysql://mysqldb:3306/springProduct?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true
+    ports:
+      - "3300:3306"
+
+  mongo-express:
+    image: mongo-express
+    restart: always
+    ports:
+      - 8082:2000
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: user
+      ME_CONFIG_MONGODB_ADMINPASSWORD: usermongo
+      ME_CONFIG_MONGODB_URL: mongodb+srv://user:usermongo@ecommercecluster.tmydhg4.mongodb.net/userdatabase?retryWrites=true&w=majority
+
+    # Commande Service
+  order-service:
+      image: panier:latest
+      ports:
+        - "8080:8085"
+      environment:
+        - eureka.client.serviceUrl.defaultZone=http://localhost:8761/eureka/
+      depends_on:
+        - order-mysql
+
+
+    # Blog Service
+  blog-service:
+      image: blog:latest
+      ports:
+        - "8083:8041"
+      depends_on:
+        - blog-mysql
+      environment:
+        - eureka.client.serviceUrl.defaultZone=http://localhost:8761/eureka/
+
+    # Produit Service
+  product-service:
+      image: product:latest
+      ports:
+        - "8087:8060"
+      environment:
+        - eureka.client.serviceUrl.defaultZone=http://localhost:8761/eureka/
+      depends_on:
+        - produit-mysql
+
+
+#User Service
+
+  user-service:
+    image: user:latest
+    ports:
+      - "8084:8088"
+    environment:
+      - eureka.client.serviceUrl.defaultZone=http://localhost:8761/eureka/
+    depends_on:
+      - user-mysql
+
+ #panier service
+
+  panier-service:
+   image: panier:latest
+   ports:
+     - "8086:9090"
+   environment:
+     - eureka.client.serviceUrl.defaultZone=http://localhost:8761/eureka/
+#reclamation service
+
+  reclamation-service:
+    image: reclamation:latest
+    ports:
+      - "9002:8084"
+    environment:
+      - eureka.client.serviceUrl.defaultZone=http://localhost:8761/eureka/
+
+  bill-service:
+    image: bill-service:latest
+    ports:
+      - "8089:2000"
+    environment:
+      - eureka.client.serviceUrl.defaultZone=http://localhost:8761/eureka/
+    depends_on:
+      - mongo-express
+
+  apigateway-service:
+    image: apigateway:latest
+    container_name: api-gateway
+    ports:
+      - "8181:8091"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_SECURITY= TRACE
+
+      - eureka.client.serviceUrl.defaultZone=http://localhost:8761/eureka/
+
